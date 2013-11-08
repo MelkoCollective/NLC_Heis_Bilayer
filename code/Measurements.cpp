@@ -55,11 +55,11 @@ int main(int argc, char** argv){
     double energy;
 
     PARAMS prm;  //Read parameters from param.dat  : see simparam.h
-    double J;
-    double Jperp;
+    double JJ;
+    double hh;
 
-    J=prm.JJ_;
-    Jperp=prm.Jperp_;
+    JJ=prm.JJ_;
+    hh=prm.Jperp_;
 
     //eigenvector
     vector<l_double> eVec;
@@ -82,8 +82,8 @@ int main(int argc, char** argv){
     cout.precision(10);
 
     // The Jperp values to use
-    const int numJperpVals = 1;
-    double Jperpvals[numJperpVals] = {1};
+    const int numJperpVals = 2;
+    double Jperpvals[numJperpVals] = {1,3.044};
 
     // The Renyi entropies to measure (if it's not set in commandline)
     vector <double> alphas;
@@ -105,7 +105,7 @@ int main(int argc, char** argv){
         entVec.clear();
         entVec.resize(numRenyis);
 
-        Jperp = Jperpvals[Jp];
+        hh = Jperpvals[Jp];
 
 
         // Loop over all the fileGraphs ------------ 
@@ -123,7 +123,7 @@ int main(int argc, char** argv){
                     }
                 }
                 else if(fileGraphs.at(i).NumberSites==2){
-                    energy = -0.75*J;
+                    energy = -0.75*JJ;
                     for(int a=0; a<numRenyis; a++){
                         if(fileGraphs.at(i).RealSpaceCoordinates[0].size()==2){
                             entVec[a].first=log(2.0); 
@@ -134,7 +134,7 @@ int main(int argc, char** argv){
                     }
                 }
                 else{
-                    energy = -1.0*J;
+                    energy = -1.0*JJ;
                     double eig1(5./6.);
                     double eig2(1./6.);
                     for(int a=0; a<numRenyis; a++){
@@ -152,10 +152,10 @@ int main(int argc, char** argv){
             // All the graphs w/ >3 sites
             else{
                 //---Generate the Hamiltonian---
-                GENHAM HV(fileGraphs.at(i).NumberSites,J,Jperp,fileGraphs.at(i).AdjacencyList); 
+                GENHAM HV(fileGraphs.at(i).NumberSites,JJ,hh,fileGraphs.at(i).AdjacencyList); 
 
                 // Doesn't do anything really
-                LANCZOS lancz(HV.Vdim);  //dimension of Hilbert space 
+                LANCZOS lancz(HV.Vdim, JJ, hh, fileGraphs.at(i).NumberSites);  //dimension of Hilbert space 
                 //HV.SparseHamJQ();  //generates sparse matrix Hamiltonian for Lanczos
 
                 //---------- Diagonalize and get Eigenvector -------
@@ -177,7 +177,7 @@ int main(int argc, char** argv){
             //Output the Data!!   
 
             cout <<"Graph " << setw(3) << fileGraphs.at(i).Identifier <<  " Sites " <<setw(2)<< fileGraphs.at(i).NumberSites 
-                << "  Jp= " << setw(6) << Jperp << "   E=" <<setw(16)<< WeightEnergy << " Line";
+                << "  Jp= " << setw(6) << hh << "   E=" <<setw(16)<< WeightEnergy << " Line";
 
             for(int a=0; a<alphas.size(); a++){ 
                 cout  << setw(4) <<  alphas[a] << setw(16) << WeightLineEntropy[a] ;

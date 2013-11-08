@@ -1,7 +1,7 @@
 # include "Lanczos_07.h"
 #define EVECTS 0  
 
-LANCZOS::LANCZOS(const long unsigned int Dim_) : Dim (Dim_)
+LANCZOS::LANCZOS(const long unsigned int Dim_, const double JJ_, const double hh_, const int Nsite_) : Dim (Dim_), JJ (JJ_), hh (hh_), Nsite (Nsite_)
 {
   STARTIT = 5; //I always make sure to start with at least 5 iterations (but see line 159...)
   CONV_PREC = 1E-10; //The precision with which we converge to
@@ -244,7 +244,7 @@ void LANCZOS::apply(vector< l_double > & U, const GENHAM& H, const vector< l_dou
     for (long unsigned int ii = 0; ii < Dim; ii++) 
     {
         Hdiag=0;
-        bra = H.Basis[ii];
+        bra = ii;
 
         //Loop through all lattice bonds
         for(int b=0; b<H.Bond.size(); b++){
@@ -255,28 +255,19 @@ void LANCZOS::apply(vector< l_double > & U, const GENHAM& H, const vector< l_dou
             T1 = H.Bond[b].second; //Location of spin 2
             S1b = (bra>>T1)&1;      //Value of spin 2
             
-            //Offdiagonal Terms
-            if(S0b^S1b){ //if spins are opposite (10 or 01)
-                flip = bra^((1<<T0)+(1<<T1)); //Flip both spins
-                kk = H.BasPos[flip];
-                U[ii] += J*0.5 * V[kk];
-                if(ii==kk) cout << "OMG\n";
-            }//Offdiag
+            Hdiag += 2.*JJ*((S0b^S1b)-0.5);
 
-            Hdiag += J*(S0b-0.5)*(S1b-0.5); //Hamiltonian term for bond b
 
         }
+
         U[ii] += Hdiag * V[ii]; //diagonal terms
+        
+        //Offdiagonal Terms
+        for(int f=0; f < Nsite; f++){
+            flip = bra^(1<<f);  
+            U[ii] += -hh * V[flip];
+        }//offdiag
 
-
-//        for (int jj = 1; jj <= H.PosHam[ii][0]; jj++) //PosHam[i][0] is the row size
-//        {
-//            //Off-diagonal part
-//            kk = H.PosHam[ii][jj]; //position index
-//            U[ii] += H.ValHam[ii][jj] * V[kk];
-//            if (ii != kk) U[kk] += H.ValHam[ii][jj] * V[ii]; //contribution to lower half
-//        }
-//        
     }
 
 }//apply

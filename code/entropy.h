@@ -303,7 +303,8 @@ long unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long unsigned 
     /* If the region is less than or equal to half  |
        |  of the total number of sites (we have a full |
        |  unrestricted basis) Dim = 2^na              */
-    if (na<=n/2){
+ //   if (na<=n/2){
+   if(1){
         dimm = full_dim;	
         for (unsigned long i1=0; i1<full_dim; i1++) 
         {
@@ -438,6 +439,7 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
         else{EE = 1./(1.-alpha2[a])*log(renyi);}
 
         CornLineEnts[a] = EE;
+        cout << "Renyi " << alpha2[a] << " = " << EE << endl;
     }
     cout << "EE complete" << endl;
 }//End of getEE

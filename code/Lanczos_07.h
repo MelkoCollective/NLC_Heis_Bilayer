@@ -25,9 +25,12 @@ class LANCZOS{
 
   public:
     long unsigned int Dim; //dimension 
+    const double JJ;
+    const double hh;
+    const int Nsite;
 
    //Methods
-   LANCZOS(const long unsigned int);
+   LANCZOS(const long unsigned int, const double, const double, const int);
    double Diag(const GENHAM &, const int, const int, vector< l_double > &);
    void tred3(vector< vector<double> >& , vector<double>& , vector<double>& e, const int );
 
